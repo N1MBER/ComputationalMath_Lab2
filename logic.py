@@ -103,23 +103,25 @@ class Worker:
             except TypeError:
                 getReadyAnswer(3)
                 continue
-        self.startOfCalculation()
-        del answer, limits
-
-    def startOfCalculation(self):
-        calculator = Calculator(self.type_equations, self.x1, self.x2, self.accuracy)
+        calculator = Calculator(self.type_mode, self.type_equations, self.x1, self.x2, self.accuracy)
         calculator.calculate()
+        del calculator, answer, limits
 
 
 class Calculator:
+    mode_type = 0
     type_equations = 0
     x1 = 0
     x2 = 0
     swap = 1
+    step = 0
     accuracy = 0
     solvable = 1
+    calculation_error = 0
+    result_integral = 0
 
-    def __init__(self, type_equations, x1, x2, accuracy):
+    def __init__(self, mode_type, type_equations, x1, x2, accuracy):
+        self.mode_type = mode_type
         self.type_equations = type_equations
         self.accuracy = accuracy
         if x1 > x2:
@@ -134,18 +136,47 @@ class Calculator:
         i = 0
         while i <= 10000:
             if self.solvable:
-                print("ss")
+                first_integral = self.getIntegral(i)
+                second_integral = self.getIntegral(i*2)
+                if abs(first_integral - second_integral) <= self.accuracy:
+                    self.step = i
+                    self.calculation_error = abs(first_integral - second_integral)
+                    self.result_integral = second_integral
+                    break
+                if i == 10000:
+                    getReadyAnswer(5)
+                    self.step = 0
             else:
                 getReadyAnswer(4)
                 return
-            i += 1
+            i += 2
+        if self.step > 0:
+            printResult(self.result_integral, self.step, self.calculation_error)
+        else:
+            getReadyAnswer(4)
+
+    def getIntegral(self, step):
+        j = self.x1
+        step_size = (self.x2 - self.x1) / step
+        result = 0
+        while j < self.x2:
+            if self.mode_type == 1:
+                result += self.returnEquation(j)
+            elif self.mode_type == 2:
+                result += self.returnEquation(j + step_size)
+            elif self.mode_type == 3:
+                result += self.returnEquation(j + step_size / 2)
+            else:
+                return
+            j += step_size
+        return result
 
     def returnEquation(self, x):
         if self.type_equations == 1:
             if self.x1 <= 0 or self.x2 <= 0:
                 getReadyAnswer(1)
                 self.solvable = 0
-                return
+                return 0
             return 1 / math.sqrt(x)
         elif self.type_equations == 2:
             return 8 * x + x ^ 2 - (x ^ 3) / 3
@@ -158,6 +189,7 @@ class Calculator:
         else:
             self.solvable = 0
             getReadyAnswer(2)
+            return 0
 
 
 def getReadyAnswer(type_answer):
@@ -169,5 +201,13 @@ def getReadyAnswer(type_answer):
         print("Incorrect input.")
     elif type_answer == 4:
         print("No solution.")
+    elif type_answer == 5:
+        print("The specified accuracy was not achieved")
     else:
         getReadyAnswer(2)
+
+
+def printResult(integral, steps, accuracy):
+    print("Integral value: " + str(integral) +
+          "\nCount of steps: " + str(steps) +
+          "\nComputational error: " + str(accuracy) + "\n")
