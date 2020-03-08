@@ -46,14 +46,14 @@ class Worker:
 
     def select_variant(self):
         print("Please choose a equations:\n" +
-              "\t1. 1/sqrt(x)\n" +
+              "\t1. 1 / sqrt(x)\n" +
               "\t2. 8x + x^2 - x^3/3\n" +
-              "\t3. x/sqrt(x^4 + 16)\n" +
+              "\t3. 2x -10 \n" +
               "\t4. sin(x)/(cos(x)^2 + 1\n" +
               "\t5. e^2x\n")
         while 1:
             try:
-                answer = int(input("Number of equations: "))
+                answer = int(input("Number of equations: ").strip())
                 if answer == 1:
                     self.type_equations = 1
                     break
@@ -81,7 +81,6 @@ class Worker:
         while 1:
             try:
                 limits = list(input("Please input a limits of integration in format x1 x2: ").split(" "))
-                print(limits)
                 if len(limits) == 2:
                     self.x1 = float(limits[0].strip())
                     self.x2 = float(limits[1].strip())
@@ -94,8 +93,7 @@ class Worker:
                 continue
         while 1:
             try:
-                answer = input("Please input a accuracy of integration: ")
-                self.accuracy = float(answer)
+                self.accuracy = float(input("Please input a accuracy of integration: ").strip())
                 if self.accuracy <= 0:
                     getReadyAnswer(3)
                     continue
@@ -121,7 +119,7 @@ class Calculator:
     result_integral = 0
 
     def __init__(self, mode_type, type_equations, x1, x2, accuracy):
-        self.mode_type = mode_type
+        self.mode_type = int(mode_type)
         self.type_equations = type_equations
         self.accuracy = accuracy
         if x1 > x2:
@@ -133,8 +131,9 @@ class Calculator:
             self.x2 = x2
 
     def calculate(self):
-        i = 0
-        while i <= 10000:
+        i = 2
+        while i <= 5000:
+            i += 2
             if self.solvable:
                 first_integral = self.getIntegral(i)
                 second_integral = self.getIntegral(i*2)
@@ -143,13 +142,12 @@ class Calculator:
                     self.calculation_error = abs(first_integral - second_integral)
                     self.result_integral = second_integral
                     break
-                if i == 10000:
+                if i == 5000:
                     getReadyAnswer(5)
                     self.step = 0
             else:
                 getReadyAnswer(4)
                 return
-            i += 2
         if self.step > 0:
             printResult(self.result_integral, self.step, self.calculation_error)
         else:
@@ -161,11 +159,11 @@ class Calculator:
         result = 0
         while j < self.x2:
             if self.mode_type == 1:
-                result += self.returnEquation(j)
+                result += self.returnEquation(j) * step_size
             elif self.mode_type == 2:
-                result += self.returnEquation(j + step_size)
+                result += self.returnEquation(j + step_size) * step_size
             elif self.mode_type == 3:
-                result += self.returnEquation(j + step_size / 2)
+                result += self.returnEquation(j + step_size / 2) * step_size
             else:
                 return
             j += step_size
@@ -173,19 +171,19 @@ class Calculator:
 
     def returnEquation(self, x):
         if self.type_equations == 1:
-            if self.x1 <= 0 or self.x2 <= 0:
+            if self.x1 < 0 or self.x2 < 0:
                 getReadyAnswer(1)
                 self.solvable = 0
                 return 0
-            return 1 / math.sqrt(x)
+            return 2 * math.sqrt(x)
         elif self.type_equations == 2:
-            return 8 * x + x ^ 2 - (x ^ 3) / 3
+            return 4 * math.pow(x, 2) + math.pow(x, 3) / 3 - math.pow(x, 4) / 12
         elif self.type_equations == 3:
-            return x / math.sqrt(x ^ 4 + 16)
+            return 2 * math.pow(x, 2) + 10 * x
         elif self.type_equations == 4:
-            return math.sin(x) / (math.pow(math.cos(x), 2) + 1)
+            return -math.atan(math.cos(x))
         elif self.type_equations == 5:
-            return math.pow(math.e, 2 * x)
+            return math.pow(math.e, 2 * x) / 2
         else:
             self.solvable = 0
             getReadyAnswer(2)

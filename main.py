@@ -10,7 +10,7 @@ while 1:
           "\t3. Medium modification solve.\n" +
           "\t4. Exit.\n")
     try:
-        answer = float(input("Please choose a variant: "))
+        answer = float(input("Please choose a variant: ").strip())
         if answer == 1:
             logic.leftSideModSolve()
             continue
@@ -24,8 +24,8 @@ while 1:
             print("Exit...")
             break
     except TypeError:
-        print("Incorrect input")
+        logic.getReadyAnswer(3)
         continue
     except ValueError:
-        print("Incorrect input")
+        logic.getReadyAnswer(3)
         continue
