@@ -175,15 +175,15 @@ class Calculator:
                 getReadyAnswer(1)
                 self.solvable = 0
                 return 0
-            return 2 * math.sqrt(x)
+            return 1 / math.sqrt(x)
         elif self.type_equations == 2:
-            return 4 * math.pow(x, 2) + math.pow(x, 3) / 3 - math.pow(x, 4) / 12
+            return 8 * x + math.pow(x, 2) - math.pow(x, 3) / 3
         elif self.type_equations == 3:
-            return 2 * math.pow(x, 2) + 10 * x
+            return 2 * x + 10
         elif self.type_equations == 4:
-            return -math.atan(math.cos(x))
+            return math.sin(x)/(math.pow(math.cos(x), 2) + 1)
         elif self.type_equations == 5:
-            return math.pow(math.e, 2 * x) / 2
+            return math.pow(math.e, 2 * x)
         else:
             self.solvable = 0
             getReadyAnswer(2)
