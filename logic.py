@@ -130,19 +130,46 @@ class Calculator:
             self.x1 = x1
             self.x2 = x2
 
+    # def __fast_calculate(self):
+    #     i = 2
+    #     flag = 0
+    #     while i <= 10000:
+    #         i += 500
+    #         if self.solvable:
+    #             first_integral = self.getIntegral(i)
+    #             second_integral = self.getIntegral(i*2)
+    #             if abs(first_integral - second_integral) <= self.accuracy:
+    #                 self.step = i
+    #                 self.calculation_error = abs(first_integral - second_integral)
+    #                 self.result_integral = second_integral
+    #                 break
+    #             if i == 10000:
+    #                 getReadyAnswer(5)
+    #                 self.step = 0
+    #         else:
+    #             getReadyAnswer(4)
+    #             return
+    #     # while i != 1 or flag == 0:
+
+    # ==================================================
+    # Calculates the value of integrals, accuracy, count
+    # of steps and calculation error. If accuracy not
+    # achieved calls the method with failure messages,
+    # else prints the result
+    # ==================================================
     def calculate(self):
         i = 2
-        while i <= 5000:
+        while i <= 10000:
             i += 2
             if self.solvable:
                 first_integral = self.getIntegral(i)
-                second_integral = self.getIntegral(i*2)
+                second_integral = self.getIntegral(i * 2)
                 if abs(first_integral - second_integral) <= self.accuracy:
                     self.step = i
                     self.calculation_error = abs(first_integral - second_integral)
                     self.result_integral = second_integral
                     break
-                if i == 5000:
+                if i == 10000:
                     getReadyAnswer(5)
                     self.step = 0
             else:
@@ -153,6 +180,10 @@ class Calculator:
         else:
             getReadyAnswer(4)
 
+    # =================================================
+    # Return value of integral calculated user selected
+    # modification with a curtain number of steps
+    # =================================================
     def getIntegral(self, step):
         j = self.x1
         step_size = (self.x2 - self.x1) / step
@@ -169,6 +200,9 @@ class Calculator:
             j += step_size
         return result
 
+    # =================================================
+    # Return user selected equation at a specific point
+    # =================================================
     def returnEquation(self, x):
         if self.type_equations == 1:
             if self.x1 < 0 or self.x2 < 0:
@@ -181,7 +215,7 @@ class Calculator:
         elif self.type_equations == 3:
             return 2 * x + 10
         elif self.type_equations == 4:
-            return math.sin(x)/(math.pow(math.cos(x), 2) + 1)
+            return math.sin(x) / (math.pow(math.cos(x), 2) + 1)
         elif self.type_equations == 5:
             return math.pow(math.e, 2 * x)
         else:
