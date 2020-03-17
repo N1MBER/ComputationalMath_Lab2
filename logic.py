@@ -84,7 +84,6 @@ class Worker:
                 if len(limits) == 2:
                     self.x1 = float(limits[0].strip())
                     self.x2 = float(limits[1].strip())
-                    print("\""+str(self.x1)+"\""+"\""+str(self.x1)+"\"")
                     break
                 else:
                     getReadyAnswer(3)
@@ -143,7 +142,7 @@ class Calculator:
             i = 2
             while i <= 10000:
                 i += 2
-                if self.status == 0:
+                if self.status == 0 or self.status == 3:
                     first_integral = self.getIntegral(i)
                     second_integral = self.getIntegral(i * 2)
                     if (second_integral - first_integral) / 3 <= self.accuracy:
