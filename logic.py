@@ -116,6 +116,7 @@ class Calculator:
     step = 0
     accuracy = 0
     status = 0
+    solvable = 1
     calculation_error = 0
     result_integral = 0
 
@@ -140,21 +141,22 @@ class Calculator:
     def calculate(self):
         try:
             i = 2
-            while i <= 10000:
+            while i < 10000:
                 i += 2
-                if self.status == 0 or self.status == 3:
+                if self.solvable:
                     first_integral = self.getIntegral(i)
                     second_integral = self.getIntegral(i * 2)
                     if (second_integral - first_integral) / 3 <= self.accuracy:
                         self.step = i
                         self.calculation_error = (second_integral - first_integral) / 3
-                        self.result_integral = second_integral
+                        self.result_integral = self.swap * second_integral
                         break
                     if i == 10000:
                         self.status = 1
                 else:
                     return
         except ValueError:
+            self.solvable = 0
             return
 
     # =================================================
@@ -184,6 +186,7 @@ class Calculator:
         if self.type_equations == 1:
             if self.x1 <= 0 or self.x2 <= 0:
                 self.status = 2
+                self.solvable = 0
                 return 0
             return 1 / math.sqrt(x)
         elif self.type_equations == 2:
