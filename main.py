@@ -29,3 +29,5 @@ while 1:
     except ValueError:
         logic.getReadyAnswer(3)
         continue
+    except KeyboardInterrupt:
+        print("Exit...")

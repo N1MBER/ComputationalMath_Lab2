@@ -49,8 +49,8 @@ class Worker:
               "\t1. 1 / sqrt(x)\n" +
               "\t2. 8x + x^2 - x^3/3\n" +
               "\t3. 2x -10 \n" +
-              "\t4. sin(x)/(cos(x)^2 + 1\n" +
-              "\t5. e^2x\n")
+              "\t4. sin(x)/(cos(x)^2 + 1')\n" +
+              "\t5. sin(x)/x\n")
         while 1:
             try:
                 answer = int(input("Number of equations: ").strip())
@@ -80,10 +80,11 @@ class Worker:
                 continue
         while 1:
             try:
-                limits = list(input("Please input a limits of integration in format x1 x2: ").split(" "))
+                limits = list(input("Please input a limits of integration in format x1 x2: ").strip().split(" "))
                 if len(limits) == 2:
                     self.x1 = float(limits[0].strip())
                     self.x2 = float(limits[1].strip())
+                    print("\""+str(self.x1)+"\""+"\""+str(self.x1)+"\"")
                     break
                 else:
                     getReadyAnswer(3)
@@ -103,6 +104,7 @@ class Worker:
                 continue
         calculator = Calculator(self.type_mode, self.type_equations, self.x1, self.x2, self.accuracy)
         calculator.calculate()
+        printResult(calculator.status, calculator.result_integral, calculator.step, calculator.accuracy)
         del calculator, answer, limits
 
 
@@ -114,7 +116,7 @@ class Calculator:
     swap = 1
     step = 0
     accuracy = 0
-    solvable = 1
+    status = 0
     calculation_error = 0
     result_integral = 0
 
@@ -130,27 +132,6 @@ class Calculator:
             self.x1 = x1
             self.x2 = x2
 
-    # def __fast_calculate(self):
-    #     i = 2
-    #     flag = 0
-    #     while i <= 10000:
-    #         i += 500
-    #         if self.solvable:
-    #             first_integral = self.getIntegral(i)
-    #             second_integral = self.getIntegral(i*2)
-    #             if abs(first_integral - second_integral) <= self.accuracy:
-    #                 self.step = i
-    #                 self.calculation_error = abs(first_integral - second_integral)
-    #                 self.result_integral = second_integral
-    #                 break
-    #             if i == 10000:
-    #                 getReadyAnswer(5)
-    #                 self.step = 0
-    #         else:
-    #             getReadyAnswer(4)
-    #             return
-    #     # while i != 1 or flag == 0:
-
     # ==================================================
     # Calculates the value of integrals, accuracy, count
     # of steps and calculation error. If accuracy not
@@ -158,27 +139,24 @@ class Calculator:
     # else prints the result
     # ==================================================
     def calculate(self):
-        i = 2
-        while i <= 10000:
-            i += 2
-            if self.solvable:
-                first_integral = self.getIntegral(i)
-                second_integral = self.getIntegral(i * 2)
-                if abs(first_integral - second_integral) <= self.accuracy:
-                    self.step = i
-                    self.calculation_error = abs(first_integral - second_integral)
-                    self.result_integral = second_integral
-                    break
-                if i == 10000:
-                    getReadyAnswer(5)
-                    self.step = 0
-            else:
-                getReadyAnswer(4)
-                return
-        if self.step > 0:
-            printResult(self.result_integral, self.step, self.calculation_error)
-        else:
-            getReadyAnswer(4)
+        try:
+            i = 2
+            while i <= 10000:
+                i += 2
+                if self.status == 0:
+                    first_integral = self.getIntegral(i)
+                    second_integral = self.getIntegral(i * 2)
+                    if (second_integral - first_integral) / 3 <= self.accuracy:
+                        self.step = i
+                        self.calculation_error = (second_integral - first_integral) / 3
+                        self.result_integral = second_integral
+                        break
+                    if i == 10000:
+                        self.status = 1
+                else:
+                    return
+        except ValueError:
+            return
 
     # =================================================
     # Return value of integral calculated user selected
@@ -205,9 +183,8 @@ class Calculator:
     # =================================================
     def returnEquation(self, x):
         if self.type_equations == 1:
-            if self.x1 < 0 or self.x2 < 0:
-                getReadyAnswer(1)
-                self.solvable = 0
+            if self.x1 <= 0 or self.x2 <= 0:
+                self.status = 2
                 return 0
             return 1 / math.sqrt(x)
         elif self.type_equations == 2:
@@ -217,10 +194,11 @@ class Calculator:
         elif self.type_equations == 4:
             return math.sin(x) / (math.pow(math.cos(x), 2) + 1)
         elif self.type_equations == 5:
-            return math.pow(math.e, 2 * x)
+            if x == 0:
+                self.status = 3
+                return 1
+            return math.sin(x) / x
         else:
-            self.solvable = 0
-            getReadyAnswer(2)
             return 0
 
 
@@ -234,12 +212,26 @@ def getReadyAnswer(type_answer):
     elif type_answer == 4:
         print("No solution.")
     elif type_answer == 5:
-        print("The specified accuracy was not achieved")
+        print("The specified accuracy was not achieved.")
+    elif type_answer == 6:
+        print("Break point of the second kind. The limit doesn't exist.")
+    elif type_answer == 7:
+        print("The integration limits contain a break point of the first kind.")
     else:
         getReadyAnswer(2)
 
 
-def printResult(integral, steps, accuracy):
-    print("Integral value: " + str(integral) +
-          "\nCount of steps: " + str(steps) +
-          "\nComputational error: " + str(accuracy) + "\n")
+def printResult(status, integral, steps, accuracy):
+    if status == 0:
+        print("Integral value: " + str(integral) +
+              "\nCount of steps: " + str(steps) +
+              "\nComputational error: " + str(accuracy) + "\n")
+    elif status == 1:
+        getReadyAnswer(5)
+        getReadyAnswer(4)
+    elif status == 2:
+        getReadyAnswer(6)
+    elif status == 3:
+        getReadyAnswer(7)
+    else:
+        getReadyAnswer(2)
