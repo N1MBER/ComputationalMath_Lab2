@@ -103,7 +103,7 @@ class Worker:
                 continue
         calculator = Calculator(self.type_mode, self.type_equations, self.x1, self.x2, self.accuracy)
         calculator.calculate()
-        printResult(calculator.status, calculator.result_integral, calculator.step, calculator.accuracy)
+        printResult(calculator.status, calculator.result_integral, calculator.step, calculator.calculation_error)
         del calculator, answer, limits
 
 
@@ -155,13 +155,15 @@ class Calculator:
                 i += 2
                 first_integral = self.getIntegral(i)
                 second_integral = self.getIntegral(i * 2)
-                if (second_integral - first_integral) / 3 <= self.accuracy:
+                if abs(second_integral - first_integral) / 3 <= self.accuracy:
                     self.step = i
-                    self.calculation_error = (second_integral - first_integral) / 3
+                    self.calculation_error = abs(second_integral - first_integral) / 3
                     self.result_integral = self.swap * second_integral
                     break
                 if i == 10000:
                     self.status = 1
+                    self.solvable = 0
+                    break
             except TypeError:
                 continue
 
