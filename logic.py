@@ -131,6 +131,16 @@ class Calculator:
         else:
             self.x1 = x1
             self.x2 = x2
+        self.check_distance()
+
+    def check_distance(self):
+        if self.type_equations == 1:
+            if self.x1 <= 0 or self.x2 <= 0:
+                self.status = 2
+                self.solvable = 0
+        elif self.type_equations == 5:
+            if self.x1 < 0 and self.x2 > 0:
+                self.status = 3
 
     # ==================================================
     # Calculates the value of integrals, accuracy, count
@@ -139,25 +149,21 @@ class Calculator:
     # else prints the result
     # ==================================================
     def calculate(self):
-        try:
-            i = 2
-            while i < 10000:
+        i = 2
+        while i < 10000 and self.solvable:
+            try:
                 i += 2
-                if self.solvable:
-                    first_integral = self.getIntegral(i)
-                    second_integral = self.getIntegral(i * 2)
-                    if (second_integral - first_integral) / 3 <= self.accuracy:
-                        self.step = i
-                        self.calculation_error = (second_integral - first_integral) / 3
-                        self.result_integral = self.swap * second_integral
-                        break
-                    if i == 10000:
-                        self.status = 1
-                else:
-                    return
-        except ValueError:
-            self.solvable = 0
-            return
+                first_integral = self.getIntegral(i)
+                second_integral = self.getIntegral(i * 2)
+                if (second_integral - first_integral) / 3 <= self.accuracy:
+                    self.step = i
+                    self.calculation_error = (second_integral - first_integral) / 3
+                    self.result_integral = self.swap * second_integral
+                    break
+                if i == 10000:
+                    self.status = 1
+            except TypeError:
+                continue
 
     # =================================================
     # Return value of integral calculated user selected
@@ -183,25 +189,21 @@ class Calculator:
     # Return user selected equation at a specific point
     # =================================================
     def returnEquation(self, x):
-        if self.type_equations == 1:
-            if self.x1 <= 0 or self.x2 <= 0:
-                self.status = 2
-                self.solvable = 0
+        try:
+            if self.type_equations == 1:
+                return 1 / math.sqrt(x)
+            elif self.type_equations == 2:
+                return 8 * x + math.pow(x, 2) - math.pow(x, 3) / 3
+            elif self.type_equations == 3:
+                return 2 * x + 10
+            elif self.type_equations == 4:
+                return math.sin(x) / (math.pow(math.cos(x), 2) + 1)
+            elif self.type_equations == 5:
+                return math.sin(x) / x
+            else:
                 return 0
-            return 1 / math.sqrt(x)
-        elif self.type_equations == 2:
-            return 8 * x + math.pow(x, 2) - math.pow(x, 3) / 3
-        elif self.type_equations == 3:
-            return 2 * x + 10
-        elif self.type_equations == 4:
-            return math.sin(x) / (math.pow(math.cos(x), 2) + 1)
-        elif self.type_equations == 5:
-            if x == 0:
-                self.status = 3
-                return 1
-            return math.sin(x) / x
-        else:
-            return 0
+        except ZeroDivisionError:
+            return 1
 
 
 def getReadyAnswer(type_answer):
@@ -235,5 +237,8 @@ def printResult(status, integral, steps, accuracy):
         getReadyAnswer(6)
     elif status == 3:
         getReadyAnswer(7)
+        print("Integral value: " + str(integral) +
+              "\nCount of steps: " + str(steps) +
+              "\nComputational error: " + str(accuracy) + "\n")
     else:
         getReadyAnswer(2)
