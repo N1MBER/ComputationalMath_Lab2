@@ -31,3 +31,4 @@ while 1:
         continue
     except KeyboardInterrupt:
         print("Exit...")
+        break
